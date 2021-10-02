@@ -1,0 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.input-decoration{
+    @apply w-full px-3 py-2 text-gray-800 placeholder-gray-500 transition duration-500 border border-gray-200 rounded-md  focus:outline-none font-bold focus:border-black;
+}

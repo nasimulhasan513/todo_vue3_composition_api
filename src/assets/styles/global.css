@@ -1,0 +1,16 @@
+@import url('https://fonts.maateen.me/solaiman-lipi/font.css');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;600&display=swap');
+
+.bangla{
+     font-family: 'SolaimanLipi', Poppins, sans-serif !important;
+}
+
+@font-face {
+  font-family: sofia;
+  src: url(./sofia.otf);
+  font-weight: bold;
+}
+
+.fsofia{
+  font-family: sofia;
+}
