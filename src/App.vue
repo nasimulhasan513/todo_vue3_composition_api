@@ -51,7 +51,7 @@
             v-for="(t, i) in todos"
             :key="i"
             class="flex items-center p-2 text-lg bg-gray-300 rounded-full cursor-pointer  bg-opacity-60 hover:bg-gray-100"
-            @click="deleteTodo(t.id)"
+            @click="viewDetails(t)"
           >
             <span class="mr-2 text-green-500 material-icons">
               check_circle
@@ -59,6 +59,59 @@
             {{ t.title }}
           </li>
         </ul>
+      </div>
+    </div>
+    <div
+      v-if="showModal"
+      class="fixed z-0 flex items-center justify-center min-w-full min-h-screen p-4 bg-opacity-50  bg-gray-50"
+    >
+      <div
+        class="z-10 p-5 bg-white border border-white shadow-sm  md:w-1/2 lg:w-1/3 rounded-2xl"
+      >
+        <div v-if="!editable">
+          <div class="my-3 mb-5">
+            <h2 class="text-xl font-semibold text-center capitalize">
+              {{ currentTodo.title }}
+            </h2>
+            <p class="my-2 text-center">
+              {{ new Date(currentTodo.time.toDate()).toLocaleString() }}
+            </p>
+          </div>
+          <div class="flex justify-center gap-2">
+            <button
+              @click="editable = !editable"
+              class="px-3 py-2 font-semibold text-white transition duration-150 bg-green-500  hover:bg-red-600"
+            >
+              Edit
+            </button>
+            <button
+              @click="deleteTodo(currentTodo.id)"
+              class="px-3 py-2 font-semibold text-white transition duration-150 bg-red-500  hover:bg-red-600"
+            >
+              Delete
+            </button>
+
+            <button
+              @click="showModal = !showModal"
+              class="px-3 py-2 font-semibold text-white transition duration-150 bg-blue-500  hover:bg-red-600"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+        <div class="space-y-3 text-center" v-else>
+          <input
+            type="text"
+            class="input-decoration"
+            v-model="currentTodo.title"
+          />
+          <button
+            @click="updateTodo"
+            class="px-3 py-2 font-semibold text-white transition duration-150 bg-blue-500  hover:bg-red-600"
+          >
+            Update
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -74,6 +127,7 @@ import {
   query,
   where,
   addDoc,
+  updateDoc,
   serverTimestamp,
   doc,
   deleteDoc,
@@ -111,10 +165,43 @@ export default defineComponent({
         todos.value = tds;
       });
     });
-    const deleteTodo = async (id: string) => {
-      await deleteDoc(doc(db, "todos", id));
+    const currentTodo = ref<any>();
+    const showModal = ref<Boolean>(false);
+    const editable = ref<Boolean>(false);
+    const viewDetails = (todo: Object) => {
+      currentTodo.value = todo;
+      showModal.value = true;
     };
-    return { addTodo, title, deleteTodo, isAuthenticated, user, todos };
+    const updateTodo = async () => {
+      try {
+        await updateDoc(
+          doc(db, "todos", currentTodo.value.id),
+          currentTodo.value
+        );
+        editable.value = false;
+      } catch (error) {}
+    };
+    const deleteTodo = async (id: string) => {
+      try {
+        await deleteDoc(doc(db, "todos", id));
+        showModal.value = false;
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    return {
+      addTodo,
+      title,
+      deleteTodo,
+      isAuthenticated,
+      currentTodo,
+      user,
+      todos,
+      viewDetails,
+      showModal,
+      editable,
+      updateTodo,
+    };
   },
 });
 </script>
